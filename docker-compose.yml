@@ -1,0 +1,40 @@
+# ==================== 轻客管家 Docker Compose ====================
+# 一键启动：docker compose up -d
+# 一键停止：docker compose down
+
+services:
+  # MySQL 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: qingke-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: Lzx040305
+      MYSQL_DATABASE: qingke_manager
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # SpringBoot 应用
+  app:
+    build: .
+    container_name: qingke-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/qingke_manager?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Lzx040305
+
+volumes:
+  mysql-data:

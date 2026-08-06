@@ -1,0 +1,17 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --c-bg: #f4f5f7;
+  --c-surface: #fff;
+  --c-border: #e8eaed;
+  --c-text: #1a1d23;
+  --c-text-muted: #6b7280;
+  --c-primary: #2563eb;
+  --c-primary-hover: #1d4ed8;
+  --c-danger: #ef4444;
+  --c-success: #10b981;
+  --c-sidebar: #0f172a;
+  --c-sidebar-text: #94a3b8;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --radius: 8px;
+}
+body { font-family: var(--font); background: var(--c-bg); color: var(--c-text); }

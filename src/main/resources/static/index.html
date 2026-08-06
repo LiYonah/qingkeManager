@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>轻客管家 — 企业服务管理系统</title>
+<style>
+/* ====== Reset & Variables ====== */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --sidebar-w: 232px;
+  --c-bg: #f4f5f7;
+  --c-surface: #ffffff;
+  --c-border: #e8eaed;
+  --c-text: #1a1d23;
+  --c-text-muted: #6b7280;
+  --c-primary: #2563eb;
+  --c-primary-hover: #1d4ed8;
+  --c-primary-soft: #eff6ff;
+  --c-sidebar: #0f172a;
+  --c-sidebar-hover: #1e293b;
+  --c-sidebar-active: #1e3a5f;
+  --c-sidebar-text: #94a3b8;
+  --c-sidebar-text-active: #e2e8f0;
+  --c-danger: #ef4444;
+  --c-success: #10b981;
+  --c-warning: #f59e0b;
+  --c-info: #3b82f6;
+  --radius: 8px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+body { font-family:var(--font); background:var(--c-bg); color:var(--c-text); line-height:1.5; -webkit-font-smoothing:antialiased; }
+
+/* ====== Login Page ====== */
+.login-wrapper {
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  background: linear-gradient(135deg, #f0f4ff 0%, #e8eeff 40%, #f4f5f7 100%);
+  position:relative; overflow:hidden;
+}
+.login-wrapper::before {
+  content:''; position:absolute; top:-180px; right:-120px; width:500px; height:500px;
+  border-radius:50%; background:radial-gradient(circle, rgba(37,99,235,0.06) 0%, transparent 70%);
+}
+.login-wrapper::after {
+  content:''; position:absolute; bottom:-100px; left:-80px; width:360px; height:360px;
+  border-radius:50%; background:radial-gradient(circle, rgba(37,99,235,0.04) 0%, transparent 70%);
+}
+.login-card {
+  position:relative; z-index:1; background:var(--c-surface); border-radius:16px;
+  padding:48px 40px 40px; max-width:400px; width:calc(100% - 32px); box-shadow:0 25px 50px -12px rgba(0,0,0,0.12);
+  border:1px solid var(--c-border);
+}
+.login-logo { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+.login-logo .icon {
+  width:40px; height:40px; border-radius:10px; background:linear-gradient(135deg, #2563eb, #1d4ed8);
+  display:flex; align-items:center; justify-content:center; color:#fff; font-size:20px;
+}
+.login-logo h1 { font-size:22px; font-weight:700; color:#0f172a; letter-spacing:-0.3px; }
+.login-subtitle { font-size:14px; color:var(--c-text-muted); margin-bottom:32px; }
+.login-field { margin-bottom:20px; }
+.login-field label { display:block; font-size:13px; font-weight:500; color:#374151; margin-bottom:6px; }
+.login-field input {
+  width:100%; padding:10px 14px; border:1px solid var(--c-border); border-radius:8px;
+  font-size:14px; font-family:var(--font); transition:border 0.2s, box-shadow 0.2s;
+  background:#fafbfc;
+}
+.login-field input:focus-visible { outline:2px solid var(--c-primary); outline-offset:2px; border-color:var(--c-primary); box-shadow:0 0 0 3px rgba(37,99,235,0.1); background:#fff; }
+.login-btn {
+  width:100%; padding:11px; background:var(--c-primary); color:#fff; border:none; border-radius:8px;
+  font-size:15px; font-weight:600; cursor:pointer; font-family:var(--font); margin-top:8px;
+  transition:background 0.2s, transform 0.1s;
+}
+.login-btn:hover { background:var(--c-primary-hover); }
+.login-btn:active { transform:scale(0.98); }
+.login-error { margin-top:12px; font-size:13px; color:var(--c-danger); text-align:center; display:none; }
+
+/* ====== Dashboard Layout ====== */
+.dashboard { display:none; height:100vh; }
+.sidebar {
+  position:fixed; left:0; top:0; bottom:0; width:var(--sidebar-w); background:var(--c-sidebar);
+  display:flex; flex-direction:column; z-index:100; overflow-y:auto;
+}
+.sidebar-brand { padding:20px 20px 28px; display:flex; align-items:center; gap:10px; border-bottom:1px solid rgba(255,255,255,0.06); }
+.sidebar-brand .icon {
+  width:34px; height:34px; border-radius:8px; background:linear-gradient(135deg, #3b82f6, #2563eb);
+  display:flex; align-items:center; justify-content:center; color:#fff; font-size:17px; flex-shrink:0;
+}
+.sidebar-brand h2 { font-size:17px; font-weight:700; color:#f1f5f9; letter-spacing:-0.2px; }
+.sidebar-nav { padding:12px 12px; flex:1; }
+.nav-section { margin-bottom:20px; }
+.nav-section-title { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:#94a3b8; padding:0 12px 8px; }
+.nav-item {
+  display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:6px;
+  color:var(--c-sidebar-text); font-size:14px; cursor:pointer; transition:background 0.15s, color 0.15s; margin-bottom:2px;
+  font-weight:450; border:none; background:none; width:100%; font-family:var(--font); text-align:left;
+}
+.nav-item:hover { background:var(--c-sidebar-hover); color:var(--c-sidebar-text-active); }
+.nav-item.active { background:var(--c-sidebar-active); color:#e2e8f0; font-weight:550; }
+.nav-item .nav-icon { font-size:16px; width:20px; text-align:center; flex-shrink:0; }
+.sidebar-footer { padding:12px 20px 16px; border-top:1px solid rgba(255,255,255,0.06); }
+.sidebar-user { display:flex; align-items:center; gap:8px; }
+.sidebar-user .avatar {
+  width:30px; height:30px; border-radius:6px; background:#334155; display:flex;
+  align-items:center; justify-content:center; color:#cbd5e1; font-size:13px; font-weight:600; flex-shrink:0;
+}
+.sidebar-user .info { flex:1; min-width:0; }
+.sidebar-user .info .name { font-size:13px; font-weight:550; color:#e2e8f0; }
+.sidebar-user .info .role { font-size:11px; color:#94a3b8; }
+.logout-btn { background:none; border:none; color:#94a3b8; cursor:pointer; font-size:18px; padding:4px; font-family:var(--font); transition:color 0.15s; }
+.logout-btn:hover { color:#f87171; }
+
+/* ====== Main Content ====== */
+.main { margin-left:var(--sidebar-w); padding:32px 36px; min-height:100vh; }
+.page-header { margin-bottom:28px; }
+.page-header h3 { font-size:22px; font-weight:700; color:#0f172a; letter-spacing:-0.3px; }
+.page-header .breadcrumb { font-size:13px; color:var(--c-text-muted); margin-top:2px; }
+
+/* Stats Grid */
+.stats-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-bottom:28px; }
+.stat-card {
+  background:var(--c-surface); border:1px solid var(--c-border); border-radius:12px;
+  padding:20px 24px; cursor:pointer; transition:all 0.2s; position:relative; overflow:hidden;
+  box-shadow:var(--shadow-sm);
+}
+.stat-card::before { content:''; position:absolute; top:0; left:0; width:4px; height:100%; border-radius:0 3px 3px 0; transition:opacity 0.2s; opacity:0; }
+.stat-card:hover { box-shadow:var(--shadow-lg); transform:translateY(-1px); }
+.stat-card:hover::before, .stat-card:focus-visible::before { opacity:1; }
+.stat-card:focus-visible { outline:2px solid var(--c-primary); outline-offset:2px; box-shadow:var(--shadow-lg); }
+.stat-card.employees::before { background:#3b82f6; }
+.stat-card.customers::before { background:#10b981; }
+.stat-card.services::before { background:#f59e0b; }
+.stat-card.orders::before { background:#8b5cf6; }
+.stat-card .stat-icon { font-size:24px; margin-bottom:10px; }
+.stat-card .stat-num { font-size:32px; font-weight:700; color:#0f172a; letter-spacing:-1px; line-height:1; }
+.stat-card .stat-label { font-size:13px; color:var(--c-text-muted); margin-top:6px; }
+
+/* Table Section */
+.table-section { background:var(--c-surface); border:1px solid var(--c-border); border-radius:12px; overflow:hidden; box-shadow:var(--shadow-sm); }
+.table-header { padding:16px 24px; border-bottom:1px solid var(--c-border); display:flex; justify-content:space-between; align-items:center; }
+.table-header h4 { font-size:15px; font-weight:600; }
+.table-badge { font-size:12px; background:var(--c-primary-soft); color:var(--c-primary); padding:3px 10px; border-radius:20px; font-weight:500; }
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; }
+th { text-align:left; padding:12px 20px; font-size:12px; font-weight:600; color:var(--c-text-muted); text-transform:uppercase; letter-spacing:0.04em; background:#fafbfc; border-bottom:1px solid var(--c-border); white-space:nowrap; }
+td { padding:12px 20px; font-size:13px; border-bottom:1px solid #f3f4f6; color:#374151; }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:#fafbfc; }
+.empty-state { padding:60px 24px; text-align:center; color:var(--c-text-muted); }
+.empty-state .empty-icon { font-size:40px; margin-bottom:12px; }
+.empty-state p { font-size:14px; }
+.badge {
+  display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:550;
+}
+.badge-success { background:#ecfdf5; color:#059669; }
+.badge-info { background:#eff6ff; color:#2563eb; }
+.badge-warning { background:#fffbeb; color:#d97706; }
+.badge-neutral { background:#f3f4f6; color:#6b7280; }
+
+/* Loading */
+.loading { text-align:center; padding:40px; color:var(--c-text-muted); }
+
+/* ====== Responsive ====== */
+@media (max-width:768px) {
+  .sidebar { width:60px; }
+  .sidebar-brand h2, .nav-item span:not(.nav-icon), .nav-section-title, .sidebar-user .info { display:none; }
+  .main { margin-left:60px; padding:20px; }
+  .stats-grid { grid-template-columns:repeat(2,1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== LOGIN VIEW ==================== -->
+<div class="login-wrapper" id="loginView">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="icon">&#x1f3e2;</div>
+      <h1>轻客管家</h1>
+    </div>
+    <p class="login-subtitle">企业办公服务综合管理系统</p>
+    <form onsubmit="login();return false">
+    <div class="login-field">
+      <label for="username">用户名</label>
+      <input type="text" id="username" placeholder="请输入用户名" value="admin" autocomplete="username">
+    </div>
+    <div class="login-field">
+      <label for="password">密码</label>
+      <input type="password" id="password" placeholder="请输入密码" value="123456" autocomplete="current-password">
+    </div>
+    <button class="login-btn" id="loginBtn" type="submit">登 录</button>
+    <p class="login-error" id="loginError" role="alert"></p>
+    </form>
+  </div>
+</div>
+
+<!-- ==================== DASHBOARD VIEW ==================== -->
+<div class="dashboard" id="dashboardView">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="icon">&#x1f3e2;</div>
+      <h2>轻客管家</h2>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">业务管理</div>
+        <button class="nav-item active" data-module="employees" onclick="switchModule('employees')">
+          <span class="nav-icon">&#x1f465;</span> 员工管理
+        </button>
+        <button class="nav-item" data-module="customers" onclick="switchModule('customers')">
+          <span class="nav-icon">&#x1f3e2;</span> 客户管理
+        </button>
+        <button class="nav-item" data-module="service-categories" onclick="switchModule('service-categories')">
+          <span class="nav-icon">&#x1f527;</span> 服务分类
+        </button>
+        <button class="nav-item" data-module="orders" onclick="switchModule('orders')">
+          <span class="nav-icon">&#x1f4cb;</span> 订单管理
+        </button>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar" id="sidebarAvatar"></div>
+        <div class="info">
+          <div class="name" id="sidebarName"></div>
+          <div class="role" id="sidebarRole"></div>
+        </div>
+        <button class="logout-btn" onclick="logout()" title="退出登录">&#x2386;</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="page-header">
+      <h3 id="pageTitle">&#x1f465; 员工管理</h3>
+      <div class="breadcrumb" id="breadcrumb">员工列表</div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="stats-grid">
+      <div class="stat-card employees" role="button" tabindex="0" onclick="switchModule('employees')" onkeydown="if(event.key==='Enter'||event.key===' ') {event.preventDefault();switchModule('employees')}">
+        <div class="stat-icon">&#x1f465;</div>
+        <div class="stat-num" id="countEmployees">—</div>
+        <div class="stat-label">员工总数</div>
+      </div>
+      <div class="stat-card customers" role="button" tabindex="0" onclick="switchModule('customers')" onkeydown="if(event.key==='Enter'||event.key===' ') {event.preventDefault();switchModule('customers')}">
+        <div class="stat-icon">&#x1f3e2;</div>
+        <div class="stat-num" id="countCustomers">—</div>
+        <div class="stat-label">客户总数</div>
+      </div>
+      <div class="stat-card services" role="button" tabindex="0" onclick="switchModule('service-categories')" onkeydown="if(event.key==='Enter'||event.key===' ') {event.preventDefault();switchModule('service-categories')}">
+        <div class="stat-icon">&#x1f527;</div>
+        <div class="stat-num" id="countServices">—</div>
+        <div class="stat-label">服务分类</div>
+      </div>
+      <div class="stat-card orders" role="button" tabindex="0" onclick="switchModule('orders')" onkeydown="if(event.key==='Enter'||event.key===' ') {event.preventDefault();switchModule('orders')}">
+        <div class="stat-icon">&#x1f4cb;</div>
+        <div class="stat-num" id="countOrders">—</div>
+        <div class="stat-label">订单总数</div>
+      </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-section">
+      <div class="table-header">
+        <h4 id="tableTitle">员工列表</h4>
+        <span class="table-badge" id="tableBadge"></span>
+      </div>
+      <div class="table-wrap">
+        <div id="tableContent"><div class="empty-state"><div class="empty-icon">&#x1f4ca;</div><p>点击上方卡片或侧边栏菜单查看数据</p></div></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+// ====== State ======
+let token = '';
+let userInfo = null;
+
+// ====== Module Configs ======
+const MODULES = {
+  'employees': {
+    icon: '&#x1f465;', label: '员工管理', crumb: '员工列表',
+    path: '/employees', fields: ['id','name','department','position','salary','status'],
+    headers: ['ID','姓名','部门','职位','薪资','状态'],
+    formatters: {
+      salary: v => v != null ? '¥' + Number(v).toFixed(2) : '—',
+      status: v => v === 1 ? '<span class="badge badge-success">在职</span>' : (v === 0 ? '<span class="badge badge-neutral">离职</span>' : '—')
+    }
+  },
+  'customers': {
+    icon: '&#x1f3e2;', label: '客户管理', crumb: '客户列表',
+    path: '/customers', fields: ['id','name','phone','company','email'],
+    headers: ['ID','姓名','电话','公司','邮箱'],
+    formatters: {}
+  },
+  'service-categories': {
+    icon: '&#x1f527;', label: '服务分类', crumb: '服务列表',
+    path: '/service-categories', fields: ['id','name','description','price'],
+    headers: ['ID','名称','描述','价格'],
+    formatters: { price: v => v != null ? '¥' + Number(v).toFixed(2) : '—' }
+  },
+  'orders': {
+    icon: '&#x1f4cb;', label: '订单管理', crumb: '订单列表',
+    path: '/orders', fields: ['id','orderNo','customerId','serviceCategoryId','amount','status'],
+    headers: ['ID','订单编号','客户ID','服务ID','金额','状态'],
+    formatters: {
+      amount: v => v != null ? '¥' + Number(v).toFixed(2) : '—',
+      status: v => {
+        const map = {0: '<span class="badge badge-warning">待处理</span>', 1: '<span class="badge badge-info">进行中</span>', 2: '<span class="badge badge-success">已完成</span>', 3: '<span class="badge badge-neutral">已取消</span>'};
+        return map[v] || '—';
+      }
+    }
+  }
+};
+const countIdMap = { 'employees':'countEmployees', 'customers':'countCustomers', 'service-categories':'countServices', 'orders':'countOrders' };
+let currentModule = 'employees';
+
+// ====== API Helpers ======
+const API = '/api';
+async function api(path, opts = {}) {
+  const headers = { ...(opts.headers || {}) };
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  if (!headers['Content-Type'] && opts.body) headers['Content-Type'] = 'application/json';
+  const res = await fetch(API + path, { ...opts, headers });
+  return res.json();
+}
+
+// ====== Login ======
+async function login() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const errEl = document.getElementById('loginError');
+  const btn = document.getElementById('loginBtn');
+
+  if (!username || !password) { errEl.style.display='block'; errEl.textContent='请输入用户名和密码'; return; }
+
+  btn.textContent = '登录中...'; btn.disabled = true; errEl.style.display = 'none';
+  try {
+    const data = await api('/login', { method:'POST', body:JSON.stringify({ username, password }) });
+    if (data.code === 200) {
+      token = data.data.token;
+      userInfo = data.data.user;
+      showDashboard();
+    } else {
+      errEl.style.display = 'block'; errEl.textContent = data.message || '登录失败';
+    }
+  } catch (e) {
+    errEl.style.display = 'block'; errEl.textContent = '无法连接服务器，请确认 SpringBoot 已启动';
+  }
+  btn.textContent = '登 录'; btn.disabled = false;
+}
+
+// ====== Dashboard ======
+function showDashboard() {
+  document.getElementById('loginView').style.display = 'none';
+  document.getElementById('dashboardView').style.display = 'block';
+
+  // Set user info in sidebar
+  const name = userInfo.realName || userInfo.username || '用户';
+  document.getElementById('sidebarAvatar').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('sidebarName').textContent = name;
+  document.getElementById('sidebarRole').textContent = userInfo.role === 'ADMIN' ? '管理员' : '普通用户';
+
+  loadAllCounts();
+  switchModule('employees');
+}
+
+function logout() {
+  token = ''; userInfo = null;
+  document.getElementById('loginView').style.display = 'flex';
+  document.getElementById('dashboardView').style.display = 'none';
+  document.getElementById('loginError').style.display = 'none';
+  document.getElementById('username').value = 'admin';
+  document.getElementById('password').value = '123456';
+}
+
+// ====== Data Loading ======
+async function loadAllCounts() {
+  for (const [mod, cfg] of Object.entries(MODULES)) {
+    try {
+      const data = await api(cfg.path + '?size=1');
+      const el = document.getElementById(countIdMap[mod]);
+      if (el) el.textContent = (data.data && typeof data.data.total === 'number') ? data.data.total : '—';
+    } catch (e) { /* silent */ }
+  }
+}
+
+async function switchModule(mod) {
+  currentModule = mod;
+  const cfg = MODULES[mod];
+
+  // Update UI
+  document.getElementById('pageTitle').innerHTML = cfg.icon + ' ' + cfg.label;
+  document.getElementById('breadcrumb').textContent = cfg.crumb;
+  document.getElementById('tableTitle').textContent = cfg.crumb;
+  document.querySelectorAll('.nav-item').forEach(el => { el.classList.remove('active'); el.removeAttribute('aria-current'); });
+  const activeNav = document.querySelector(`[data-module="${mod}"]`);
+  if (activeNav) { activeNav.classList.add('active'); activeNav.setAttribute('aria-current', 'page'); }
+
+  // Load data
+  document.getElementById('tableContent').innerHTML = '<div class="loading">加载中...</div>';
+  try {
+    const data = await api(cfg.path);
+    const records = (data.data && data.data.records) ? data.data.records : [];
+    document.getElementById('tableBadge').textContent = '共 ' + (data.data?.total ?? records.length) + ' 条';
+
+    if (records.length === 0) {
+      document.getElementById('tableContent').innerHTML = '<div class="empty-state"><div class="empty-icon">&#x1f4ad;</div><p>暂无数据</p></div>';
+      return;
+    }
+
+    let html = '<table><thead><tr>';
+    cfg.headers.forEach(h => html += '<th>' + h + '</th>');
+    html += '</tr></thead><tbody>';
+    records.forEach(row => {
+      html += '<tr>';
+      cfg.fields.forEach(f => {
+        const val = row[f];
+        const fmt = cfg.formatters[f];
+        html += '<td>' + (fmt ? fmt(val) : (val !== null && val !== undefined ? val : '—')) + '</td>';
+      });
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+    document.getElementById('tableContent').innerHTML = html;
+  } catch (e) {
+    document.getElementById('tableContent').innerHTML = '<div class="empty-state"><div class="empty-icon">&#x26a0;</div><p>加载失败</p></div>';
+  }
+}
+</script>
+</body>
+</html>

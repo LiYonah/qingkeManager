@@ -1,0 +1,52 @@
+# ==================== 轻客管家 — 应用配置 ====================
+
+# ========== 服务端口 ==========
+server:
+  port: 8080
+  # 开发时显示详细错误信息
+  error:
+    include-message: always
+    include-exception: true
+
+# ========== 数据库配置 ==========
+spring:
+  datasource:
+    # JDBC 连接地址（轻客管家数据库，后面会创建）
+    url: jdbc:mysql://127.0.0.1:3306/qingke_manager?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    # 数据库用户名（请改为你的 MySQL root 密码）
+    username: root
+    password: Lzx040305
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+# ========== MyBatis-Plus 配置 ==========
+mybatis-plus:
+  # 驼峰命名转换（数据库字段 user_name → Java 属性 userName）
+  configuration:
+    map-underscore-to-camel-case: true
+    # 控制台打印 SQL（开发时开启方便调试）
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  # 全局实体配置
+  global-config:
+    db-config:
+      # 主键策略：ASSIGN_ID = 雪花算法自动生成 Long 型 ID
+      id-type: assign_id
+      # 逻辑删除字段名
+      logic-delete-field: isDeleted
+      logic-delete-value: 1     # 已删除
+      logic-not-delete-value: 0 # 未删除
+  # Mapper XML 文件位置（如果使用 XML 方式写 SQL）
+  # mapper-locations: classpath*:/mapper/**/*.xml
+
+# ========== SpringDoc API 文档 ==========
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+# ========== 日志级别 ==========
+logging:
+  level:
+    com.qingke.manager: debug
+    org.springframework: info
+    org.springdoc: debug
