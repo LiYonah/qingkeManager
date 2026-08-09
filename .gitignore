@@ -18,3 +18,6 @@ Thumbs.db
 # Node (Vue)
 qingke-web/node_modules/
 qingke-web/dist/
+
+# Node（根目录 PPT 生成脚本依赖）
+node_modules/

@@ -1,0 +1,21 @@
+# Maven
+target/
+
+# IDE
+.idea/
+.vscode/
+
+# Git
+.git/
+
+# Node（避免把本地 node_modules 传入构建上下文）
+node_modules/
+qingke-web/node_modules/
+qingke-web/dist/
+
+# 日志
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

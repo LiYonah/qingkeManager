@@ -11,11 +11,12 @@ server:
 # ========== 数据库配置 ==========
 spring:
   datasource:
-    # JDBC 连接地址（轻客管家数据库，后面会创建）
-    url: jdbc:mysql://127.0.0.1:3306/qingke_manager?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
-    # 数据库用户名（请改为你的 MySQL root 密码）
-    username: root
-    password: Lzx040305
+    # JDBC 连接地址（支持环境变量覆盖：DB_HOST / DB_PORT / DB_NAME）
+    url: jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:qingke_manager}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    # 数据库用户名（支持环境变量 DB_USERNAME 覆盖）
+    username: ${DB_USERNAME:root}
+    # 数据库密码（生产环境务必通过环境变量 DB_PASSWORD 或 SPRING_DATASOURCE_PASSWORD 覆盖默认值）
+    password: ${DB_PASSWORD:Lzx040305}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 # ========== MyBatis-Plus 配置 ==========
@@ -37,7 +38,6 @@ mybatis-plus:
   # Mapper XML 文件位置（如果使用 XML 方式写 SQL）
   # mapper-locations: classpath*:/mapper/**/*.xml
 
-# ========== SpringDoc API 文档 ==========
 springdoc:
   api-docs:
     path: /v3/api-docs

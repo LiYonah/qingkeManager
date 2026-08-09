@@ -1,6 +1,13 @@
 # ==================== 轻客管家 Docker Compose ====================
 # 一键启动：docker compose up -d
 # 一键停止：docker compose down
+# 首次启动会自动执行 sql/init.sql 初始化数据库表和管理员账号
+#
+# 可通过环境变量覆盖（推荐生产环境使用 .env 文件）：
+#   MYSQL_ROOT_PASSWORD : 数据库 root 密码（默认 Lzx040305，生产务必修改）
+#   MYSQL_DATABASE      : 数据库名（默认 qingke_manager）
+#   MYSQL_PORT          : 数据库对外映射端口（默认 3306，本机 3306 被占用时改为其他端口，如 3307）
+#   示例：MYSQL_ROOT_PASSWORD=你的密码 MYSQL_PORT=3307 docker compose up -d
 
 services:
   # MySQL 数据库
@@ -9,12 +16,14 @@ services:
     container_name: qingke-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: Lzx040305
-      MYSQL_DATABASE: qingke_manager
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-Lzx040305}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-qingke_manager}
+      TZ: Asia/Shanghai
     ports:
-      - "3306:3306"
+      - "${MYSQL_PORT:-3306}:3306"
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./sql:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -32,9 +41,10 @@ services:
       mysql:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/qingke_manager?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-qingke_manager}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: Lzx040305
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-Lzx040305}
+      TZ: Asia/Shanghai
 
 volumes:
   mysql-data:
