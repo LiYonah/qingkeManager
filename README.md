@@ -33,15 +33,15 @@
 
 | 登录页 | 员工管理 |
 |:---:|:---:|
-| ![登录页](docs/screenshots/login.png) | ![员工管理](docs/screenshots/employees.png) |
+| ![登录页](docs/images/login.png) | ![员工管理](docs/images/employees.png) |
 
 | 客户管理 | 订单管理 |
 |:---:|:---:|
-| ![客户管理](docs/screenshots/customers.png) | ![订单管理](docs/screenshots/orders.png) |
+| ![客户管理](docs/images/customers.png) | ![订单管理](docs/images/orders.png) |
 
 | 服务分类 |
 |:---:|
-| ![服务分类](docs/screenshots/services.png) |
+| ![服务分类](docs/images/services.png) |
 
 ## 🛠️ 技术栈
 
@@ -125,7 +125,7 @@ qingkeManager/
 │       └── common/           # 统一返回 R、全局异常
 ├── qingke-web/               # Vue 3 前端源码
 ├── sql/init.sql              # 生产初始化脚本（建表 + 默认管理员）
-├── docs/screenshots/         # 项目截图
+├── docs/images/         # 项目截图
 ├── Dockerfile                # 多阶段构建（前端 + 后端，JDK 21）
 ├── docker-compose.yml        # 一键部署编排
 └── pom.xml                   # Maven 配置
