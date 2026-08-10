@@ -4,6 +4,9 @@
 --       若使用本地 MySQL，请手动执行：mysql -uroot -p < sql/init.sql
 -- ============================================================
 
+-- 强制连接字符集为 utf8mb4，避免中文被按 latin1 错误存储
+SET NAMES utf8mb4;
+
 -- ---------- 1. 系统用户表 ----------
 CREATE TABLE IF NOT EXISTS sys_user (
     id          BIGINT       PRIMARY KEY AUTO_INCREMENT,
