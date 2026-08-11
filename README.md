@@ -4,6 +4,8 @@
 
 **企业办公服务综合管理系统 · Enterprise Office Service Management System**
 
+> **✨ 一句话定位**：从客户线索到服务订单的数字化闭环 —— 让企业办公服务管理专业、高效、可追溯。
+>
 一款面向企业办公服务场景的前后端分离管理系统，覆盖**客户、员工、服务分类、订单流转与操作审计**等核心业务，实现从客户线索到服务订单的闭环管理，支持 Docker 一键部署。
 
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.5-6DB33F?logo=spring&logoColor=white)
